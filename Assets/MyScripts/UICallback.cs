@@ -166,9 +166,9 @@ public class UICallback : MonoBehaviour
             slider = this.GetComponent<Slider>();
             PlayerPrefs.SetFloat((char.ToLowerInvariant(objectName[0]) + objectName.Substring(1)).Replace(" ", "") + "Value", slider.value);
             //Debug.Log((char.ToLowerInvariant(name[0]) + name.Substring(1)).Replace(" ", "") + "Value");
-            text = GameObject.Find(objectName + " Text").GetComponent<TMP_InputField>();
-            text.text = slider.value.ToString();
-            flagSliderOrText = true;
+            //text = GameObject.Find(objectName + " Text").GetComponent<TMP_InputField>();
+            //text.text = slider.value.ToString();
+            //flagSliderOrText = true;
         }
     }
 
@@ -282,12 +282,33 @@ public class UICallback : MonoBehaviour
 
     public void LoadNewGazer3DHMD()
     {
-        calibrationController.subsCtrl.requestCtrl.StopPlugin("GazerHMD3D");
+        //calibrationController.subsCtrl.requestCtrl.StopPlugin("GazerHMD3D");
 
-        object[] LeftMatrix = File.ReadAllLines("C:\\Users\\Lab\\Desktop\\Calibration\\LeftMatrix.txt").Where(s => s != string.Empty).Select(s => float.Parse(s)).Cast<object>().ToArray();
-        object[] RightMatrix = File.ReadAllLines("C:\\Users\\Lab\\Desktop\\Calibration\\RightMatrix.txt").Where(s => s != string.Empty).Select(s => float.Parse(s)).Cast<object>().ToArray();
-        object[] BiMatrix0 = File.ReadAllLines("C:\\Users\\Lab\\Desktop\\Calibration\\BiMatrix0.txt").Where(s => s != string.Empty).Select(s => float.Parse(s)).Cast<object>().ToArray();
-        object[] BiMatrix1 = File.ReadAllLines("C:\\Users\\Lab\\Desktop\\Calibration\\BiMatrix1.txt").Where(s => s != string.Empty).Select(s => float.Parse(s)).Cast<object>().ToArray();
+        object[] LeftMatrixTemp = File.ReadAllLines("C:\\Users\\Lab\\Desktop\\Calibration\\LeftMatrix.txt").Where(s => s != string.Empty).Select(s => float.Parse(s)).Cast<object>().ToArray();
+        object[] RightMatrixTemp = File.ReadAllLines("C:\\Users\\Lab\\Desktop\\Calibration\\RightMatrix.txt").Where(s => s != string.Empty).Select(s => float.Parse(s)).Cast<object>().ToArray();
+        object[] BiMatrix0Temp = File.ReadAllLines("C:\\Users\\Lab\\Desktop\\Calibration\\BiMatrix0.txt").Where(s => s != string.Empty).Select(s => float.Parse(s)).Cast<object>().ToArray();
+        object[] BiMatrix1Temp = File.ReadAllLines("C:\\Users\\Lab\\Desktop\\Calibration\\BiMatrix1.txt").Where(s => s != string.Empty).Select(s => float.Parse(s)).Cast<object>().ToArray();
+
+        object[][] LeftMatrix = new object[4][]; object[][] RightMatrix = new object[4][]; object[][] BiMatrix0 = new object[4][]; object[][] BiMatrix1 = new object[4][];
+
+        for (int i = 0; i < 4; i++)
+        {
+            LeftMatrix[i] = new object[4];
+            RightMatrix[i] = new object[4];
+            BiMatrix0[i] = new object[4];
+            BiMatrix1[i] = new object[4];
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            for (int k = 0; k < 4; k++)
+            {
+                LeftMatrix[i][k] = LeftMatrixTemp[4 * i + k];
+                RightMatrix[i][k] = RightMatrixTemp[4 * i + k];
+                BiMatrix0[i][k] = BiMatrix0Temp[4 * i + k];
+                BiMatrix1[i][k] = BiMatrix1Temp[4 * i + k];
+            }
+        }
 
         Dictionary<object, object> leftModelDic = new Dictionary<object, object> {
             { "eye_camera_to_world_matrix", LeftMatrix },
@@ -319,13 +340,6 @@ public class UICallback : MonoBehaviour
             { "params", paramsDic }
         };
 
-        try
-        {
-            calibrationController.subsCtrl.requestCtrl.StartPlugin("GazerHMD3D", args);
-        }
-        catch (System.Exception e)
-        {
-            Debug.Log(e);
-        }
+        calibrationController.subsCtrl.requestCtrl.StartPlugin("GazerHMD3D", args);
     }
 }

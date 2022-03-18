@@ -151,6 +151,8 @@ namespace PupilLabs
 
             //subsCtrl.SubscribeTo("calibration", CustomReceiveData);
 
+            subsCtrl.SubscribeTo("logging.info", ReceiveLogs);
+
             marker.localScale = markerSize * Vector3.one;
 
             bool allReferencesValid = true;
@@ -195,11 +197,6 @@ namespace PupilLabs
             SetPreviewMarkers(false);
         }
 
-        void CustomReceiveData(string topic, Dictionary<string, object> dictionary, byte[] thirdFrame = null)
-        {
-            Debug.Log(dictionary["result"].ToString());
-        }
-
         void OnDisable()
         {
             //sp.Close();
@@ -211,6 +208,8 @@ namespace PupilLabs
             {
                 StopCalibration();
             }
+
+            subsCtrl.UnsubscribeFrom("logging.info", ReceiveLogs);
         }
 
         private void Start()
@@ -246,7 +245,15 @@ namespace PupilLabs
             else
             {
                 //UpdatePreviewMarkers();
-                pos = previewMarkers[targetIdx].transform.position;
+                try
+                {
+                    if (targetIdx > 8) targetIdx = 0;
+                    pos = previewMarkers[targetIdx].transform.position;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(e);
+                }
             }
 
             //print(string.Format("X: {0}, XT: {1}, Y: {2}, YT: {3}", gazeX, pos.x, gazeY, pos.y));
@@ -984,6 +991,16 @@ namespace PupilLabs
             runNumber++;
 
             PlayerPrefs.SetInt("Fusion Run Number", runNumber);
+        }
+
+        private void ReceiveLogs(string topic, Dictionary<string, object> dictionary, byte[] thirdFrame = null)
+        {
+            //foreach (KeyValuePair<string, object> entry in dictionary)
+            //{
+            //    Debug.Log(string.Format("{0}: {1}", topic, entry.ToString()));
+            //}
+
+            Debug.Log(topic);
         }
     }
 }

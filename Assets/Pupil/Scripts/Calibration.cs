@@ -10,7 +10,7 @@ using System.IO;
 
 namespace PupilLabs
 {
-    public class Calibration
+    public class Calibration : MonoBehaviour
     {
         //events
         public event Action OnCalibrationStarted;
@@ -45,7 +45,6 @@ namespace PupilLabs
             subsCtrl.SubscribeTo("notify.calibration.successful", ReceiveSuccess);
             subsCtrl.SubscribeTo("notify.calibration.failed", ReceiveFailure);
             subsCtrl.SubscribeTo("notify.calibration.", ReceiveCalibrationData);
-            //subsCtrl.SubscribeTo("logs.", ReceiveCalibrationData);
 
             requestCtrl.StartPlugin(settings.PluginName);
             publisher = new Publisher(requestCtrl);
